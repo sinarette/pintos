@@ -1,0 +1,13 @@
+https://drive.google.com/drive/folders/1rk8ig6tyF0CEbDnG0cAgwjPWpFpAUi-y
+
+Kernel panic in run: PANIC at ../../tests/threads/tests.c:93 in fail(): test failed
+Call stack: 0x80042138b9 0x8004217056 0x80042175b7 0x80042170aa 0x8004216e88 0x8004206644 0x8004206795 0x8004206128
+Translation of call stack:
+0x00000080042138b9: debug_panic (lib/kernel/debug.c:32)
+0x0000008004217056: pass (tests/threads/tests.c:99)
+0x00000080042175b7: test_sleep (tests/threads/alarm-wait.c:126 (discriminator 2))
+0x00000080042170aa: test_alarm_single (tests/threads/alarm-wait.c:19)
+0x0000008004216e88: run_test (tests/threads/tests.c:57)
+0x0000008004206644: run_task (threads/init.c:252)
+0x0000008004206795: run_actions (threads/init.c:297)
+0x0000008004206128: main (threads/init.c:125)
