@@ -58,7 +58,6 @@ bool thread_mlfqs;
 static void kernel_thread (thread_func *, void *aux);
 
 static void idle (void *aux UNUSED);
-static void thread_priority_yield (void);
 static struct thread *next_thread_to_run (void);
 static void init_thread (struct thread *, const char *name, int priority);
 static void do_schedule(int status);
@@ -258,6 +257,11 @@ list_higher_priority (const struct list_elem *a, const struct list_elem *b, void
 	return st_a->priority > st_b->priority;
 }
 
+struct list_elem *
+thread_list_highest_priority (struct list *list) {
+	return list_min (list, list_higher_priority, NULL);
+}
+
 static bool
 list_less_wakeup (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED) {
 	struct thread *st_a = list_entry(a, struct thread, elem);
@@ -375,7 +379,7 @@ thread_get_priority (void) {
 	return thread_current ()->priority;
 }
 
-static void
+void
 thread_priority_yield (void) {
 	if (list_empty (&ready_list)) return;
 	struct thread *curr = thread_current ();
