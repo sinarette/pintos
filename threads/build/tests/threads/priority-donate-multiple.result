@@ -1,13 +1,13 @@
 FAIL
 Kernel panic in run: PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
-Call stack: 0x8004213920 0x8004208b81 0x8004208f3a 0x8004207c7d 0x800420de44 0x8004216e75 0x8004216cda 0x800420680e 0x8004206145
+Call stack: 0x8004213944 0x8004208ba5 0x8004208f5e 0x8004207ca1 0x800420de68 0x8004216e99 0x8004216cfe 0x800420680e 0x8004206145
 Translation of call stack:
-0x0000008004213920: debug_panic (lib/kernel/debug.c:32)
-0x0000008004208b81: intr_handler (threads/interrupt.c:365)
-0x0000008004208f3a: intr_entry (threads/intr-stubs.o:?)
-0x0000008004207c7d: intr_set_level (threads/interrupt.c:131 (discriminator 1))
-0x000000800420de44: vga_putc (devices/vga.c:92)
-0x0000008004216e75: putchar_have_lock (lib/kernel/console.c:177)
-0x0000008004216cda: puts (lib/kernel/console.c:136)
+0x0000008004213944: debug_panic (lib/kernel/debug.c:32)
+0x0000008004208ba5: intr_handler (threads/interrupt.c:365)
+0x0000008004208f5e: intr_entry (threads/intr-stubs.o:?)
+0x0000008004207ca1: intr_set_level (threads/interrupt.c:131 (discriminator 1))
+0x000000800420de68: vga_putc (devices/vga.c:92)
+0x0000008004216e99: putchar_have_lock (lib/kernel/console.c:177)
+0x0000008004216cfe: puts (lib/kernel/console.c:136)
 0x000000800420680e: power_off (threads/init.c:348)
 0x0000008004206145: main (threads/init.c:127)

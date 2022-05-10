@@ -28,16 +28,16 @@ Thread: 0 idle ticks, 26 kernel ticks, 0 user ticks
 Console: 947 characters output
 Keyboard: 0 keys pressed
 Powering off...
-Interrupt 0x0d (#GP General Protection Exception) at rip=8004208f88
+Interrupt 0x0d (#GP General Protection Exception) at rip=8004208fac
  cr2=0000000000000000 error=            5000
 rax 0000000000000000 rbx 0000000000204400 rcx 00000080040b8000 rdx 00000000000003d4
 rsp 0000008004000ed8 rbp 0000008004000f30 rsi 000000000000800f rdi 0000000000000001
-rip 0000008004208f88 r8 0000008004000ec8  r9 0000008004216d8f r10 0000000000000000
+rip 0000008004208fac r8 0000008004000ec8  r9 0000008004216db3 r10 0000000000000000
 r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
 r15 0000000000000000 rflags 00200006
 es: 0010 ds: 0010 cs: 0008 ss: 0010
 Kernel PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
-Call stack: 0x8004213920 0x8004208b81 0x8004208f3a 0x8004207c7d 0x800420de44 0x8004216e75 0x8004216cda 0x800420680e 0x8004206145.
+Call stack: 0x8004213944 0x8004208ba5 0x8004208f5e 0x8004207ca1 0x800420de68 0x8004216e99 0x8004216cfe 0x800420680e 0x8004206145.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.

@@ -246,7 +246,6 @@ thread_unblock (struct thread *t) {
 
 	old_level = intr_disable ();
 	ASSERT (t->status == THREAD_BLOCKED);
-	//list_push_back (&ready_list, &t->elem);
 	list_insert_ordered(&ready_list, &t->elem, list_higher_priority, NULL);
 	t->status = THREAD_READY;
 	intr_set_level (old_level);
@@ -318,7 +317,7 @@ thread_current (void) {
 	   of stack, so a few big automatic arrays or moderate
 	   recursion can cause stack overflow. */
 	ASSERT (is_thread (t));
-	//ASSERT (t->status == THREAD_RUNNING);
+	ASSERT (t->status == THREAD_RUNNING);
 
 	return t;
 }
@@ -357,7 +356,6 @@ thread_yield (void) {
 
 	old_level = intr_disable ();
 	if (curr != idle_thread)
-		//list_push_back (&ready_list, &curr->elem);
 		list_insert_ordered(&ready_list, &curr->elem, list_higher_priority, NULL);
 	do_schedule (THREAD_READY);
 	intr_set_level (old_level);
@@ -486,14 +484,8 @@ static struct thread *
 next_thread_to_run (void) {
 	if (list_empty (&ready_list))
 		return idle_thread;
-	else {
-		struct thread *t = list_entry (list_front (&ready_list), struct thread, elem);
-		//printf("\n  0x%p  \n", t);
-		//printf("\n %s   pri:%d\n", t->name, t->priority);
-
+	else
 		return list_entry (list_pop_front (&ready_list), struct thread, elem);
-		//return list_entry (list_pop_back (&ready_list), struct thread, elem);
-	}
 }
 
 /* Use iretq to launch the thread */
@@ -620,7 +612,6 @@ schedule (void) {
 	ASSERT (is_thread (next));
 	/* Mark us as running. */
 	next->status = THREAD_RUNNING;
-	//printf("%s == %d\n", next->name, next->priority);
 
 	/* Start new time slice. */
 	thread_ticks = 0;
