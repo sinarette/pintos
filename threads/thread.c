@@ -58,6 +58,7 @@ bool thread_mlfqs;
 static void kernel_thread (thread_func *, void *aux);
 
 static void idle (void *aux UNUSED);
+static void thread_priority_yield (void);
 static struct thread *next_thread_to_run (void);
 static void init_thread (struct thread *, const char *name, int priority);
 static void do_schedule(int status);
@@ -210,6 +211,7 @@ thread_create (const char *name, int priority,
 
 	/* Add to run queue. */
 	thread_unblock (t);
+	thread_priority_yield ();
 
 	return tid;
 }
@@ -244,8 +246,8 @@ thread_unblock (struct thread *t) {
 
 	old_level = intr_disable ();
 	ASSERT (t->status == THREAD_BLOCKED);
-	list_push_back (&ready_list, &t->elem);
-	//list_insert_ordered(&ready_list, &t->elem, list_higher_priority, NULL);
+	//list_push_back (&ready_list, &t->elem);
+	list_insert_ordered(&ready_list, &t->elem, list_higher_priority, NULL);
 	t->status = THREAD_READY;
 	intr_set_level (old_level);
 }
@@ -316,7 +318,7 @@ thread_current (void) {
 	   of stack, so a few big automatic arrays or moderate
 	   recursion can cause stack overflow. */
 	ASSERT (is_thread (t));
-	ASSERT (t->status == THREAD_RUNNING);
+	//ASSERT (t->status == THREAD_RUNNING);
 
 	return t;
 }
@@ -355,8 +357,8 @@ thread_yield (void) {
 
 	old_level = intr_disable ();
 	if (curr != idle_thread)
-		list_push_back (&ready_list, &curr->elem);
-		//list_insert_ordered(&ready_list, &curr->elem, list_higher_priority, NULL);
+		//list_push_back (&ready_list, &curr->elem);
+		list_insert_ordered(&ready_list, &curr->elem, list_higher_priority, NULL);
 	do_schedule (THREAD_READY);
 	intr_set_level (old_level);
 }
@@ -366,12 +368,22 @@ void
 thread_set_priority (int new_priority) {
 	thread_current ()->priority = new_priority;
 	list_sort(&ready_list, list_higher_priority, NULL);
+	thread_priority_yield ();
 }
 
 /* Returns the current thread's priority. */
 int
 thread_get_priority (void) {
 	return thread_current ()->priority;
+}
+
+static void
+thread_priority_yield (void) {
+	if (list_empty (&ready_list)) return;
+	struct thread *curr = thread_current ();
+	struct thread *high = list_entry (list_front (&ready_list), struct thread, elem);
+	
+	if (curr->priority < high->priority) thread_yield();
 }
 
 /* Sets the current thread's nice value to NICE. */
@@ -475,8 +487,7 @@ next_thread_to_run (void) {
 	if (list_empty (&ready_list))
 		return idle_thread;
 	else {
-		//struct thread *t = list_entry (list_front (&ready_list), struct thread, elem);
-		int size UNUSED = list_size (&ready_list);
+		struct thread *t = list_entry (list_front (&ready_list), struct thread, elem);
 		//printf("\n  0x%p  \n", t);
 		//printf("\n %s   pri:%d\n", t->name, t->priority);
 
@@ -609,6 +620,7 @@ schedule (void) {
 	ASSERT (is_thread (next));
 	/* Mark us as running. */
 	next->status = THREAD_RUNNING;
+	//printf("%s == %d\n", next->name, next->priority);
 
 	/* Start new time slice. */
 	thread_ticks = 0;
