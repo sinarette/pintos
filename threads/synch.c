@@ -175,7 +175,15 @@ lock_init (struct lock *lock) {
 	ASSERT (lock != NULL);
 
 	lock->holder = NULL;
+	lock->priority = 0;
 	sema_init (&lock->semaphore, 1);
+}
+
+static bool
+lock_list_less_priority (const struct list_elem *a, const struct list_elem *b, void *aux UNUSED) {
+	struct lock *_a = list_entry(a, struct lock, elem);
+	struct lock *_b = list_entry(b, struct lock, elem);
+	return _a->priority < _b->priority;
 }
 
 /* Acquires LOCK, sleeping until it becomes available if
@@ -192,9 +200,38 @@ lock_acquire (struct lock *lock) {
 	ASSERT (!intr_context ());
 	ASSERT (!lock_held_by_current_thread (lock));
 
+	struct thread *curr = thread_current ();
+	curr->lock_waiting = lock;
+	donate_priority(lock, curr->priority);
+
 	sema_down (&lock->semaphore);
-	lock->holder = thread_current ();
+	curr->lock_waiting = NULL;
+
+	list_push_back(&curr->lock_holding, &lock->elem);
+	lock->holder = curr;
+	lock->priority = curr->priority;
 }
+
+static void
+__donate_priority (struct lock *lock, int priority, int depth) {
+	if (depth <= 0) return;
+
+	if (lock->priority > priority) return;
+	lock->priority = priority;
+
+	if (lock->holder == NULL) return;
+	struct thread *holder = lock->holder;
+	holder->priority = priority;
+
+	if (holder->lock_waiting == NULL) return;
+	__donate_priority (holder->lock_waiting, priority, depth - 1);
+}
+
+void
+donate_priority (struct lock *lock, int priority) {
+	__donate_priority(lock, priority, 8);
+}
+
 
 /* Tries to acquires LOCK and returns true if successful or false
    on failure.  The lock must not already be held by the current
@@ -221,12 +258,26 @@ lock_try_acquire (struct lock *lock) {
    An interrupt handler cannot acquire a lock, so it does not
    make sense to try to release a lock within an interrupt
    handler. */
+
+int
+thread_new_priority(struct thread *t) {
+	if (list_empty (&t->lock_holding)) return t->init_priority;
+	struct list_elem *e = list_max (&t->lock_holding, lock_list_less_priority, NULL);
+	int highest = list_entry (e, struct lock, elem)->priority;
+	return highest > t->init_priority ? highest : t->init_priority;
+}
+
 void
 lock_release (struct lock *lock) {
 	ASSERT (lock != NULL);
 	ASSERT (lock_held_by_current_thread (lock));
 
+	struct thread *curr = lock->holder;
 	lock->holder = NULL;
+	list_remove (&lock->elem);
+
+	curr->priority = thread_new_priority (curr);
+
 	sema_up (&lock->semaphore);
 }
 

@@ -1,2 +1,11 @@
 FAIL
-Run produced no output at all
+Kernel panic in run: PANIC at ../../tests/threads/tests.c:93 in fail(): test failed
+Call stack: 0x8004213a35 0x80042171d2 0x800421a2da 0x8004217004 0x8004206644 0x8004206795 0x8004206128
+Translation of call stack:
+0x0000008004213a35: debug_panic (lib/kernel/debug.c:32)
+0x00000080042171d2: pass (tests/threads/tests.c:99)
+0x000000800421a2da: test_mlfqs_load_1 (tests/threads/mlfqs/mlfqs-load-1.c:31)
+0x0000008004217004: run_test (tests/threads/tests.c:57)
+0x0000008004206644: run_task (threads/init.c:252)
+0x0000008004206795: run_actions (threads/init.c:297)
+0x0000008004206128: main (threads/init.c:125)
